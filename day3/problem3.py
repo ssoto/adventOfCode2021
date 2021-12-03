@@ -5,10 +5,10 @@ def read_input(file_name="input.txt"):
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(cur_dir, file_name)
     with open(file_path) as fd:
-        return fd.readlines()
+        return [s.strip() for s in fd.readlines()]
 
 
-def transmute_input(input):
+def transpose_input(input):
     result = ['' for i in range(len(input[0].strip()))]
     for i in range(len(input)):
         element = input[i].strip()
@@ -20,12 +20,18 @@ def transmute_input(input):
 
 
 def count_1_and_0(input):
-    result = []
-    for value in input:
-        result.append({
-            0: value.count('0'),
-            1: value.count('1')
-        })
+    if type(input) == str:
+        result = {
+            0: input.count('0'),
+            1: input.count('1')
+        }
+    else:
+        result = []
+        for value in input:
+            result.append({
+                0: value.count('0'),
+                1: value.count('1')
+            })
     return result
 
 
@@ -55,14 +61,70 @@ def binary_to_decimal(binary: str):
 
 def part1():
     input = read_input()
-    nice_input = transmute_input(input)
+    nice_input = transpose_input(input)
     frecuencies_list_of_dicts = count_1_and_0(nice_input)
     binary_gamma_rate = most_common(frecuencies_list_of_dicts)
     binary_epsilon_rate = less_common(frecuencies_list_of_dicts)
 
     return binary_to_decimal(binary_gamma_rate) * binary_to_decimal(binary_epsilon_rate)
 
+################################
+#           Part 2             #
+################################
+
+
+def delete_from(problem_input, zero_or_one, i):
+    result = []
+    for element in problem_input:
+        if element[i] != zero_or_one:
+            result.append(element)
+    return result
+
+
+def calculate_oxygen_rating(problem_input):
+    for i in range(len(problem_input[0])):
+        transposed_input = transpose_input(problem_input)
+        frecuency_dict = count_1_and_0(transposed_input[i])
+        if frecuency_dict[1] >= frecuency_dict[0]:
+            # 0
+            to_remove = '0'
+        else:
+            # 1
+            to_remove = '1'
+        problem_input = delete_from(problem_input, to_remove, i)
+        if len(problem_input) == 1:
+            return problem_input[0]
+
+
+def calculate_co2_scrubber(problem_input):
+    for i in range(len(problem_input[0])):
+        transposed_input = transpose_input(problem_input)
+        frecuency_dict = count_1_and_0(transposed_input[i])
+        if frecuency_dict[0] <= frecuency_dict[1]:
+            # 0
+            to_remove = '1'
+        else:
+            # 1
+            to_remove = '0'
+        problem_input = delete_from(problem_input, to_remove, i)
+        if len(problem_input) == 1:
+            return problem_input[0]
+
+
+def calculate_life_support_rating():
+    problem_input = read_input()
+    # problem_input = read_input("sample_input.txt")
+    oxygen_rating = calculate_oxygen_rating(problem_input)
+    co2_scrubber = calculate_co2_scrubber(problem_input)
+
+    return int(oxygen_rating, base=2) * int(co2_scrubber, base=2)
+
 
 if __name__ == "__main__":
+    print('Part 1:')
     power_consumption = part1()
     print(f'Compsution is {power_consumption}')
+    print('*' * 20)
+    print('Part 2: ')
+    life_support_rating = calculate_life_support_rating()
+    print(f"Life support rating is {life_support_rating}")
