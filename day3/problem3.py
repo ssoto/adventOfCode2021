@@ -30,22 +30,39 @@ def count_1_and_0(input):
 
 
 def most_common(lists_of_dicts):
-    result = ''
+    binary_result = '0b'
     for element in lists_of_dicts:
         if element[0] > element[1]:
-            result += '0'
+            binary_result += '0'
         else:
-            result += '1'
-    return result
+            binary_result += '1'
+    return binary_result
+
+
+def less_common(lists_of_dicts):
+    binary_result = '0b'
+    for element in lists_of_dicts:
+        if element[0] < element[1]:
+            binary_result += '0'
+        else:
+            binary_result += '1'
+    return binary_result
+
+
+def binary_to_decimal(binary: str):
+    return int(binary, base=2)
 
 
 def part1():
     input = read_input()
     nice_input = transmute_input(input)
-    result = count_1_and_0(nice_input)
-    binary_gamma_rate = most_common(result)
+    frecuencies_list_of_dicts = count_1_and_0(nice_input)
+    binary_gamma_rate = most_common(frecuencies_list_of_dicts)
+    binary_epsilon_rate = less_common(frecuencies_list_of_dicts)
 
+    return binary_to_decimal(binary_gamma_rate) * binary_to_decimal(binary_epsilon_rate)
 
 
 if __name__ == "__main__":
-    part1()
+    power_consumption = part1()
+    print(f'Compsution is {power_consumption}')
